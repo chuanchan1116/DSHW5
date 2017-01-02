@@ -8,7 +8,8 @@ void dumparr(int *a);
 bool DFSLoop(int *a);
 void kruskal(int *a);
 void prim(int *a);
-int visited[10];
+bool Dfs(int *a, int from, int cur);
+int bfsVis[10];
 
 int main()
 {
@@ -93,17 +94,55 @@ void prim(int *a)
 
 void kruskal(int *a)
 {
+    int added = 0, vis[10][10] = {0}, ans[100] = {0};
     cout << "Kruskal's Algorithm:" << endl;
-}
-
-bool DFSLoop(int *a, int x)
-{
-    visited[x] = true;
-    for(int i = 0; i < 10; i++){
-        if(a[x * 10 + i]){
-	    if(visited[i] || DFSLoop(a, i))  return true; // it is looped when visit a visited node or it's subgraph is looped
+    while(true){
+        int x, y, min = 2147483647;
+        for(int i = 0; i < 10; i++){ // find edge with the smallest weight
+            for(int j = i + 1; j < 10; j++){
+                if(a[i * 10 + j] && a[i * 10 + j] < min && !vis[i][j]){
+		    x = i;
+		    y = j;
+		    min = a[i * 10 + j];
+		}
+	    }
+        }
+	vis[x][y] = 1; // mark edge as chosed
+	if(min == 2147483647) break; // no more edge
+	ans[x * 10 + y] = a[x * 10 + y]; // add edge
+        ans[y * 10 + x] = a[y * 10 + x];
+	dumparr(ans);
+	if(DFSLoop(ans)){ // if looped, delete it
+	    ans[x * 10 + y] = 0;
+            ans[y * 10 + x] = 0;
+	    dumparr(ans);
 	}
     }
-    visited[x] = false;
+}
+
+bool DFSLoop(int *a)
+{
+    for(int i = 0; i < 10; i++) bfsVis[i] = 0;
+    for(int i = 0; i < 10; i++){ // search the adjacency matrix to find connected graph
+        for(int j = 0; j < 10; j++){
+	    if(a[i * 10 + j]){
+	        bfsVis[i] = 1;
+	        if(Dfs(a, i, j)) return true;
+		bfsVis[i] = false;
+	    }
+	}
+    }
+    return false;
+}
+
+bool Dfs(int *a, int from, int cur){
+    if(bfsVis[cur]) return true;
+    bfsVis[cur] = 1;
+    for(int i = 0; i < 10; i++){
+        if(a[cur * 10 + i] && (i != from)){
+	    if(Dfs(a, cur, i)) return true;
+	}
+    }
+    bfsVis[cur] = false;
     return false;
 }
