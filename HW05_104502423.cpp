@@ -8,6 +8,7 @@ void dumparr(int *a);
 bool DFSLoop(int *a);
 void kruskal(int *a);
 void prim(int *a);
+int visited[10];
 
 int main()
 {
@@ -69,7 +70,14 @@ void kruskal(int *a)
     cout << "Kruskal's Algorithm:" << endl;
 }
 
-bool DFSLoop(int *a)
+bool DFSLoop(int *a, int x)
 {
+    visited[x] = true;
+    for(int i = 0; i < 10; i++){
+        if(a[x * 10 + i]){
+	    if(visited[i] || DFSLoop(a, i))  return true;
+	}
+    }
+    visited[x] = false;
     return false;
 }
